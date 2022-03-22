@@ -1,7 +1,16 @@
+/* CSS HEX */
+:root {
+    --cod-gray: #1c1c1c;
+    --crusta: #fb842c;
+    --mine-shaft: #242424;
+    --pastel-green: #55ea56;
+    --tundora: #4d4d4d;
+}
+
 body {
     display: flex;
     flex-direction: column;
-    background-color: #43484b;
+    background-color: var(--cod-gray);
     font-family: Arial;
     color: white;
     height: 100vh;
@@ -57,8 +66,11 @@ body {
 }
 
 .option-button {
-    background-color: #e3e0d8;
-    color: black;
+    background-color: var(--tundora);
+    color: white;
+    border: 0px;
+    box-shadow: none;
+    border-radius: 0px;
     font-weight: bolder;
     font-size: 16px;
 
@@ -69,8 +81,8 @@ body {
 }
 
 .option {
-    background-color: #e3e0d8;
-    color: black;
+    background-color: var(--tundora);
+    color: white;
     font-weight: bolder;
     font-size: 16px;
 
@@ -88,10 +100,12 @@ body {
 }
 
 .grid-table td {
-    background-color: #e3e0d8;
-    color: black;
+    background-color: var(--tundora);
+    color: white;
     font-weight: bolder;
     font-size: 32px;
+
+    border: 2px solid var(--cod-gray);
 
     width: 80px;
     height: 80px;

@@ -18,9 +18,12 @@ var myCol;
 var myWord;
 var answer;
 
-let backgroundColor = '#e3e0d8';
-let firstColor = 'green';
-let secondColor = 'orange';
+var backgroundColor;
+var nonactiveColor;
+
+let firstColor = '#55ea56';
+let secondColor = '#fb842c';
+let wrongColor = '#242424';
 
 let gridFull = false;
 let rowFull = false;
@@ -32,6 +35,8 @@ function init() {
     myCol = 0;
     myWord = '';
     answer = 'GRAPE';
+    backgroundColor = '#e3e0d8';
+    nonactiveColor = '#85827A';
 
     makeGrid(5, 6);
     makeOptions();
@@ -60,7 +65,7 @@ function makeGrid(gWidth, gHeight) {
             let square = document.createElement('td');
             square.classList.add('square');
             square.id = `square_${i}_${j}`;
-            square.innerHTML = `${num}`;
+            //square.innerHTML = `${num}`;
             square.addEventListener('click', squareAction);
 
             tableStatus[square.id] = {
@@ -149,6 +154,18 @@ function makeOptions() {
     row.append(enterButton);
 
     options.append(row);
+}
+
+function setActiveRow (row) {
+    if (row < 0 || row > gridHeight) return;
+
+    for (let squareId in tableStatus) {
+        let squareObj = tableStatus[squareId];
+        let squareElement = document.getElementById(squareId);
+
+        squareElement.style.backgroundColor = squareObj['row'] === row ? backgroundColor : nonactiveColor;
+        squareObj['backgroundColor'] = squareElement.style.backgroundColor;
+    }
 }
 
 function squareAction () {
@@ -285,22 +302,29 @@ function tryAnswer () {
         if (!squareDetail) continue;
 
         let correct = myWord.substr(i, 1) === answer.substr(i, 1);
+        let almost = answer.includes(myWord.substr(i, 1));
 
         wordStatus[i] = {
             'try': myWord.substr(i, 1),
             'letter': answer.substr(i, 1),
-            'correct': correct
+            'correct': correct,
+            'almost': almost
         };
 
         let squareObj = squareDetail['squareObj'];
         let squareElement = document.getElementById(squareDetail['square']);
 
-        squareElement.style.backgroundColor = correct ? firstColor : secondColor;
+        if (almost) squareElement.style.backgroundColor = secondColor;
+        if (correct) squareElement.style.backgroundColor = firstColor;
+        if (!almost && !correct) squareElement.style.backgroundColor = wrongColor;
+
         squareObj['backgroundColor'] = squareElement.style.backgroundColor;
     }
 
     debug_log(`Word Status - Row: ${myRow}`);
     debug_log(wordStatus);
+
+    let buttonStatus = new Object();
 
     for (let tryId in wordStatus) {
         let tryDetail = wordStatus[tryId];
@@ -311,11 +335,26 @@ function tryAnswer () {
         let optionElement = document.getElementById(optionDetail['option']);
         let optionObject = optionDetail['optionObj'];
 
+        debug_log('Try Details:');
+        debug_log(tryDetail);
+        debug_log(optionElement.style.backgroundColor);
+        debug_log(firstColor);
+        debug_log(secondColor);
+        debug_log(wrongColor);
+
+        if (tryDetail['almost']) {
+            if (!buttonStatus[optionObject['letter']]) optionElement.style.backgroundColor = secondColor;
+        }
+
         if (tryDetail['correct']) {
             optionElement.style.backgroundColor = firstColor;
-        } else {
-            optionElement.style.backgroundColor = (optionElement.style.backgroundColor === firstColor) ? firstColor : secondColor;
+            buttonStatus[optionObject['letter']] = true;
         }
+
+        if (!tryDetail['almost'] && !tryDetail['correct']) {
+            if (!tryDetail['correct']) optionElement.style.backgroundColor = wrongColor;
+        }
+
         optionObject['backgroundColor'] = optionElement.style.backgroundColor;
     }
 
