@@ -26,15 +26,61 @@ body {
 }
 
 .content {
-    justify-content: center;
     align-items: center;
+    gap: 32px;
     padding: 32px;
+    flex-direction: column;
 }
 
-.grid {
+#grid {
     flex: 1;
     justify-content: center;
     align-items: center;
+}
+
+#options {
+    flex: 1;
+    padding: 32px;
+
+    flex-direction: column;
+}
+
+.option-row {
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+#options_buttons {
+    flex: 1;
+    justify-content: space-between;
+}
+
+.option-button {
+    background-color: #e3e0d8;
+    color: black;
+    font-weight: bolder;
+    font-size: 16px;
+
+    padding: 8px;
+    margin: 0;
+
+    text-align: center;
+}
+
+.option {
+    background-color: #e3e0d8;
+    color: black;
+    font-weight: bolder;
+    font-size: 16px;
+
+    width: 25px;
+    height: 25px;
+
+    padding: 8px;
+    margin: 0;
+
+    text-align: center;
 }
 
 .grid-table {
@@ -47,8 +93,8 @@ body {
     font-weight: bolder;
     font-size: 32px;
 
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
 
     padding: 0;
     margin: 0;
