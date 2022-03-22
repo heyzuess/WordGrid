@@ -4,6 +4,7 @@ window.onload = init();
 
 var grid;
 var table;
+var tableStatus;
 var gridWidth;
 var gridHeight;
 
@@ -17,6 +18,7 @@ function init() {
 
     table = document.createElement('table');
     table.classList.add('grid-table');
+    tableStatus = new Object();
 
     for (let i = 0; i < gridWidth; i++) {
         let row = document.createElement('tr');
@@ -30,6 +32,13 @@ function init() {
             square.classList.add('square');
             square.id = `square_${i}_${j}`;
             square.innerHTML = `${num}`;
+            square.addEventListener('click', squareAction);
+
+            tableStatus[square.id] = {
+                'active': false,
+                'color': 'black',
+                'background-color': 'white'
+            };
 
             row.append(square);
         }
@@ -38,4 +47,8 @@ function init() {
     }
 
     grid.append(table);
+}
+
+function squareAction () {
+    console.log(`${this.id} was clicked`);
 }
