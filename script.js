@@ -27,6 +27,7 @@ let wrongColor = '#242424';
 
 let gridFull = false;
 let rowFull = false;
+let gridComplete = false;
 
 function init() {
     // Debug
@@ -37,6 +38,13 @@ function init() {
     answer = 'GRAPE';
     backgroundColor = '#e3e0d8';
     nonactiveColor = '#85827A';
+
+    let randomLetter = Math.random() * 26;
+    let wordLetter = String.fromCharCode('A'.charCodeAt(0) + randomLetter);
+    let wordFile = `./data/${wordLetter}word.csv`;
+
+    debug_log(`Random letter selected: ${wordLetter}`);
+    debug_log(`Word file to read from: ${wordFile}`);
 
     makeGrid(5, 6);
     makeOptions();
@@ -52,7 +60,7 @@ function makeGrid(gWidth, gHeight) {
 
     table = document.createElement('table');
     table.classList.add('grid-table');
-    tableStatus = new Object();
+    tableStatus = {};
 
     for (let i = 0; i < gridHeight; i++) {
         let row = document.createElement('tr');
@@ -65,8 +73,6 @@ function makeGrid(gWidth, gHeight) {
             let square = document.createElement('td');
             square.classList.add('square');
             square.id = `square_${i}_${j}`;
-            //square.innerHTML = `${num}`;
-            square.addEventListener('click', squareAction);
 
             tableStatus[square.id] = {
                 'active': 0,
@@ -90,7 +96,7 @@ function makeGrid(gWidth, gHeight) {
 
 function makeOptions() {
     options = document.getElementById('options');
-    optionsStatus = new Object();
+    optionsStatus = {};
 
     debug_log('creating options');
 
@@ -113,7 +119,7 @@ function makeOptions() {
         optionElement.addEventListener('click', optionAction);
 
         optionsStatus[optionElement.id] = {
-            'active': 0,
+            'active': true,
             'letter': letter,
             'row': rowNum,
             'color': optionElement.style.color,
@@ -168,10 +174,6 @@ function setActiveRow (row) {
     }
 }
 
-function squareAction () {
-    //setColorFromStatus(this, tableStatus);
-}
-
 function optionAction () {
     //setColorFromStatus(this, optionsStatus);
 
@@ -182,6 +184,16 @@ function optionAction () {
 
     if (rowFull) {
         debug_log('Row is full, can not set another option action');
+        return;
+    }
+
+    if (gridComplete) {
+        debug_log('Grid is complete, can not set another option action');
+        return;
+    }
+
+    if (!optionsStatus[this.id]['active']) {
+        debug_log('Option is disabled, can not select this value');
         return;
     }
 
@@ -295,36 +307,100 @@ function tryAnswer () {
         return;
     }
 
-    let wordStatus = new Object();
+    let wordStatus = {};
+    let letterCount = {};
+    let answerArray = answer.split("");
 
+    for (let i = 0; i < answerArray.length; i++) {
+        if (!letterCount[answerArray[i]])
+        letterCount[answerArray[i]] = {
+            'count': 0,
+            'correct': 0,
+            'almost': 0
+        }
+
+        letterCount[answerArray[i]]['count']++;
+    }
+
+    /* Checks which tiles are correct, partially correct, and incorrect
+       and creates a count to hold this data for coloring of the tiles */
     for (let i = 0; i < answer.length; i++) {
         let squareDetail = findSquare(i, myRow);
+        let myLetter = myWord.substr(i, 1);
+        let answerLetter = answer.substr(i, 1);
         if (!squareDetail) continue;
 
-        let correct = myWord.substr(i, 1) === answer.substr(i, 1);
-        let almost = answer.includes(myWord.substr(i, 1));
+        let correct = myLetter === answerLetter;
+
+        if (correct) letterCount[myLetter]['correct']++;
+
+        let almost = answer.includes(myLetter);
+
+        if (almost) letterCount[myLetter]['almost']++;
 
         wordStatus[i] = {
-            'try': myWord.substr(i, 1),
-            'letter': answer.substr(i, 1),
+            'try': myLetter,
+            'letter': answerLetter,
             'correct': correct,
             'almost': almost
         };
 
         let squareObj = squareDetail['squareObj'];
+        let backgroundStyle = backgroundColor;
+
+        if (almost) backgroundStyle = secondColor;
+        if (correct) backgroundStyle = firstColor;
+        if (!almost && !correct) backgroundStyle = wrongColor;
+
+        squareObj['backgroundColor'] = backgroundStyle;
+    }
+
+    /* Sets the colors of the letter tiles depending on the counts
+       obtained from the above loop */
+    for (let i = answer.length - 1; i >= 0; i--) {
+        let squareDetail = findSquare(i, myRow);
+        let myLetter = myWord.substr(i, 1);
+        let squareObj = squareDetail['squareObj'];
         let squareElement = document.getElementById(squareDetail['square']);
 
-        if (almost) squareElement.style.backgroundColor = secondColor;
-        if (correct) squareElement.style.backgroundColor = firstColor;
-        if (!almost && !correct) squareElement.style.backgroundColor = wrongColor;
+        debug_log('@@@@@@@@@@@@@@@@@@');
+        debug_log(backgroundColor);
+        debug_log(secondColor);
 
-        squareObj['backgroundColor'] = squareElement.style.backgroundColor;
+        if (answer.includes(myLetter)) {
+            debug_log(`  count: ${letterCount[myLetter]['count']}`);
+            debug_log(`correct: ${letterCount[myLetter]['correct']}`);
+            debug_log(` almost: ${letterCount[myLetter]['almost']}`);
+        }
+
+        if (squareObj['backgroundColor'] === secondColor) {
+            if (letterCount[myLetter]['almost'] >
+                letterCount[myLetter]['count'] - letterCount[myLetter]['correct']) {
+
+                debug_log(`changing letter ${myLetter} col ${i} to (wrongcolor):${wrongColor}`);
+
+                squareObj['backgroundColor'] = wrongColor;
+            }
+        }
+
+        /* If the tile is marked wrong and the letter guessed is not found in
+           the answer then set the option tile inactive */
+        if (squareObj['backgroundColor'] === wrongColor) {
+            if (!answer.includes(myLetter)) {
+                let myOptionDetail = findOption(myLetter);
+                optionsStatus[myOptionDetail['option']]['active'] = false;
+            }
+        }
+
+        squareElement.style.backgroundColor = squareObj['backgroundColor'];
     }
 
     debug_log(`Word Status - Row: ${myRow}`);
     debug_log(wordStatus);
 
-    let buttonStatus = new Object();
+    /* Colors the options buttons depending on what was
+       correct, partially correct, incorrect */
+    let buttonStatus = {};
 
     for (let tryId in wordStatus) {
         let tryDetail = wordStatus[tryId];
@@ -358,11 +434,29 @@ function tryAnswer () {
         optionObject['backgroundColor'] = optionElement.style.backgroundColor;
     }
 
-    if (myRow + 1 >= gridHeight) {
-        gridFull = true;
+    /* Check if all tiles are correct */
+    let correct = 0;
+    let length = 0;
+    for (let letter in letterCount) {
+        if (letterCount[letter]['count'] === letterCount[letter]['correct']) correct++;
+        length++;
+    }
+
+    gridComplete = correct === length;
+    if (gridComplete) {
+        debug_log(`Grid Complete: ${gridComplete}`);
+        displayResult(true);
         return;
     }
 
+    gridFull = myRow + 1 >= gridHeight;
+    if (gridFull) {
+        debug_log(`Grid Full: ${gridFull}`);
+        displayResult(false);
+        return;
+    }
+
+    /*  Increment row count for next guess */
     myRow++;
     myCol = 0;
     rowFull = false;
@@ -391,7 +485,7 @@ function findSquare (col, row) {
         return squareDetail;
     }
 
-    squareDetail = new Object();
+    squareDetail = {};
     squareDetail['square'] = square;
     squareDetail['squareObj'] = squareObj;
 
@@ -417,9 +511,14 @@ function findOption (letter) {
         return optionDetail;
     }
 
-    optionDetail = new Object();
+    optionDetail = {};
     optionDetail['option'] = optionId;
     optionDetail['optionObj'] = optionObj;
 
     return optionDetail;
+}
+
+function displayResult (gameWin) {
+    let message = gameWin ? 'Congratulations!' : 'Sorry, better luck next time!';
+    window.alert(message);
 }
