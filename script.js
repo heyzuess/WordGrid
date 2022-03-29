@@ -35,19 +35,19 @@ function init() {
     myRow = 0;
     myCol = 0;
     myWord = '';
-    answer = 'GRAPE';
     backgroundColor = '#e3e0d8';
     nonactiveColor = '#85827A';
 
-    let randomLetter = Math.random() * 26;
-    let wordLetter = String.fromCharCode('A'.charCodeAt(0) + randomLetter);
-    let wordFile = `./data/${wordLetter}word.csv`;
-
-    debug_log(`Random letter selected: ${wordLetter}`);
-    debug_log(`Word file to read from: ${wordFile}`);
-
     makeGrid(5, 6);
     makeOptions();
+
+    answer = randomWord(gridWidth);
+
+    debug_log(`Answer has been set to: ${answer}`);
+
+    if (!answer) {
+        debug_log('Failed to choose a random word');
+    }
 }
 
 function makeGrid(gWidth, gHeight) {
@@ -288,7 +288,7 @@ function deleteLast () {
 
     myCol--;
     rowFull = false;
-    myWord = myWord.substr(1, myWord.length - 1);
+    myWord = myWord.substr(0, myWord.length - 1);
 }
 
 function tryAnswer () {
@@ -362,10 +362,6 @@ function tryAnswer () {
         let myLetter = myWord.substr(i, 1);
         let squareObj = squareDetail['squareObj'];
         let squareElement = document.getElementById(squareDetail['square']);
-
-        debug_log('@@@@@@@@@@@@@@@@@@');
-        debug_log(backgroundColor);
-        debug_log(secondColor);
 
         if (answer.includes(myLetter)) {
             debug_log(`  count: ${letterCount[myLetter]['count']}`);
@@ -463,6 +459,75 @@ function tryAnswer () {
     myWord = '';
 }
 
+function randomWord (wordLength) {
+    let word;
+
+    let randomLetter = Math.random() * 26;
+    let wordLetter = String.fromCharCode('A'.charCodeAt(0) + randomLetter);
+    let wordFile = `./data/${wordLetter}word.csv`;
+
+    let results = loadFile(wordFile).split(' ');
+
+    debug_log(`Random letter selected: ${wordLetter}`);
+    debug_log(`Word file to read from: ${wordFile}`);
+    debug_log(`results text type: ${typeof resultsText}`);
+
+    let list = [];
+
+    /* Filter results down to words that match length */
+    for (let r in results) {
+        let temp = results[r].trim();
+
+        if (temp.length !== wordLength) continue;
+
+        //debug_log(`random word -- length ok -- ${temp} -- ${temp.length}`);
+
+        /* Check each letter to make sure its >= A and <= Z */
+        let ok = false;
+        let check = 0;
+
+        for (let i = 0; i < temp.length; i++) {
+            let myLetter = temp.substr(i, 1);
+            if ((myLetter >= 'A' && myLetter <= 'Z') ||
+                (myLetter >= 'a' && myLetter <= 'z')) check++;
+        }
+
+        ok = check === temp.length;
+
+        /* Add word to list if it's all ok */
+        if (ok) {
+            //debug_log(`random word -- word added ${temp} length ${temp.length}`);
+            list.push(temp);
+        } else {
+            //debug_log(`random word -- check fail ${temp} length ${temp.length} count ${check}`);
+        }
+    }
+
+    /* Select random word from list */
+    let randomWord = Math.trunc(Math.random() * list.length);
+    word = list[randomWord].toUpperCase();
+
+    debug_log(`selected entry ${randomWord} from word list: ${word}`);
+
+    return word;
+}
+
+function loadFile(filePath) {
+    let result = null;
+    let xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.open("GET", filePath, false);
+    xmlhttp.send();
+
+    if (xmlhttp.status === 200) {
+        debug_log(`File ${filePath} loaded successfully`);
+        result = xmlhttp.responseText;
+    } else {
+        debug_log(`Read file request returned unhandled response ${xmlhttp.status}`);
+    }
+    return result;
+}
+
 function findSquare (col, row) {
     let squareDetail = null;
     let square;
@@ -473,7 +538,7 @@ function findSquare (col, row) {
 
         squareObj = tableStatus[square];
 
-        debug_log(`checking ${square}, row ${squareObj['row']} col ${squareObj['col']}`);
+        //debug_log(`checking ${square}, row ${squareObj['row']} col ${squareObj['col']}`);
 
         if (!(squareObj['row'] === row && squareObj['col'] === col)) continue;
         squareFound = true;
@@ -519,6 +584,6 @@ function findOption (letter) {
 }
 
 function displayResult (gameWin) {
-    let message = gameWin ? 'Congratulations!' : 'Sorry, better luck next time!';
+    let message = gameWin ? 'Congratulations!' : `Sorry, better luck next time!\nWord was ${answer}`;
     window.alert(message);
 }

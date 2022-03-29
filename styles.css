@@ -11,7 +11,7 @@ body {
     display: flex;
     flex-direction: column;
     background-color: var(--cod-gray);
-    font-family: Arial;
+    font-family: Arial, 'sans-serif';
     color: white;
     height: 100vh;
 }
@@ -32,6 +32,9 @@ body {
 
 .footer {
     flex: 1;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 32px;
 }
 
 .content {
@@ -68,9 +71,9 @@ body {
 .option-button {
     background-color: var(--tundora);
     color: white;
-    border: 0px;
+    border: 0;
     box-shadow: none;
-    border-radius: 0px;
+    border-radius: 0;
     font-weight: bolder;
     font-size: 16px;
 
