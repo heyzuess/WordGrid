@@ -5,6 +5,8 @@
     --mine-shaft: #242424;
     --pastel-green: #55ea56;
     --tundora: #4d4d4d;
+    --tundora-dark: #2d2d2d;
+    --hover: #183d66;
 }
 
 body {
@@ -16,10 +18,20 @@ body {
     height: 100vh;
 }
 
-.container {
+.main {
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.word-container {
     display: flex;
 
-    border: 5px solid black;
+    /* used for debug
+      border: 5px solid black;*/
 }
 
 .header {
@@ -39,8 +51,8 @@ body {
 
 .content {
     align-items: center;
-    gap: 32px;
-    padding: 32px;
+    gap: 16px;
+    padding: 0;
     flex-direction: column;
 }
 
@@ -87,15 +99,31 @@ body {
     background-color: var(--tundora);
     color: white;
     font-weight: bolder;
+    border-radius: 0;
+
     font-size: 16px;
 
-    width: 25px;
-    height: 25px;
+    padding: 5px;
+    width: 35px;
+    height: 35px;
 
-    padding: 8px;
-    margin: 0;
+    margin-bottom: 9px;
 
     text-align: center;
+}
+
+.option, .option-button {
+    box-shadow: 0 9px var(--tundora-dark);
+}
+
+.option:hover, .option-button:hover {
+    background-color: var(--hover);
+}
+
+.option:active, .option-button:active {
+    background-color: var(--hover);
+    box-shadow: 0 5px #000;
+    transform: translateY(4px);
 }
 
 .grid-table {
@@ -108,7 +136,7 @@ body {
     font-weight: bolder;
     font-size: 32px;
 
-    border: 2px solid var(--cod-gray);
+    border: 3px solid var(--cod-gray);
 
     width: 80px;
     height: 80px;

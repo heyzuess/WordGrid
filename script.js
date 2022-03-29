@@ -105,7 +105,7 @@ function makeOptions() {
 
     row.id = `options_row_${rowNum}`;
     row.classList.add('option-row');
-    row.classList.add('container');
+    row.classList.add('word-container');
 
     for (let i = 0; i < 26; i++) {
         let letter = String.fromCharCode(i + 'A'.charCodeAt(0));
@@ -136,7 +136,7 @@ function makeOptions() {
             row = document.createElement('div');
             row.id = `options_row_${++rowNum}`;
             row.classList.add('option-row');
-            row.classList.add('container');
+            row.classList.add('word-container');
         }
     }
 
@@ -144,7 +144,7 @@ function makeOptions() {
 
     row = document.createElement('div');
     row.id = 'options_buttons';
-    row.classList.add('container');
+    row.classList.add('word-container');
 
     let deleteButton = document.createElement('button');
     deleteButton.classList.add('option-button');
@@ -228,40 +228,6 @@ function optionAction () {
     debug_log(`New - RowFull: ${rowFull} GridFull: ${gridFull}`);
     debug_log(`Current Word: ${myWord}`);
 }
-
-/*
-function setColorFromStatus (eventObj, objStatus) {
-    debug_log(`${eventObj.id} was clicked`);
-
-    if (!objStatus[eventObj.id]) return;
-
-    debug_log(objStatus[eventObj.id]);
-
-    let status = objStatus[eventObj.id];
-    let element = document.getElementById(eventObj.id);
-
-    switch (status['active']) {
-        case 0:
-            status['active'] = 1;
-            element.style.backgroundColor = firstColor;
-            break;
-        case 1:
-            status['active'] = 2;
-            element.style.backgroundColor = secondColor;
-            break;
-        case 2:
-            status['active'] = 0;
-            element.style.backgroundColor = backgroundColor;
-            break;
-    }
-
-    status['color'] = eventObj.style.color;
-    status['backgroundColor'] = eventObj.style.backgroundColor;
-
-    debug_log(`Status for ${eventObj.id} has been set to ${status['active']}`);
-    debug_log(status);
-}
- */
 
 function debug_log (message) {
     if (!debug) return;

@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <title>Word Grid</title>
 </head>
 <body>
-    <div class="container header">
-        <div class="container header-item">Word Grid</div>
+    <div class="container-fluid word-container main">
+        <div class="word-container header">
+            <div class="word-container header-item">Word Grid</div>
+        </div>
+        <div class="word-container content">
+            <div id="grid" class="word-container"></div>
+            <div id="options" class="word-container"></div>
+        </div>
+        <div class="footer word-container"><small>© 2022 Jesse Iberri. All Rights Reserved.</small></div>
     </div>
-    <div class="container content">
-        <div id="grid" class="container"></div>
-        <div id="options" class="container"></div>
-    </div>
-    <div class="footer container"><small>© 2022 Jesse Iberri. All Rights Reserved.</small></div>
 
     <script type="text/javascript" src="script.js"></script>
 </body>
